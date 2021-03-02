@@ -30,17 +30,22 @@ func main() {
 
 	sub1 := "18e41964-4477-47e4-b5c0-bfef3724b4b8"
 	sub2 := "0fe8ae6c-8466-4a1e-8a65-80403a6c1b9f"
-	// identityRes1 := "/subscriptions/18e41964-4477-47e4-b5c0-bfef3724b4b8/resourcegroups/kore-msidentityhack-aks-dev-infra-uksouth/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id1"
-	// identityRes2 := "/subscriptions/18e41964-4477-47e4-b5c0-bfef3724b4b8/resourcegroups/kore-msidentityhack-aks-dev-infra-uksouth/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id2"
-	clientID1 := "ea1ebef7-45bc-4811-98ea-94ddf544c0ef"
-	clientID2 := "c8312420-5461-4089-b66b-9c481382724d"
+	// resouce IDs?
+	// ident1 := "/subscriptions/18e41964-4477-47e4-b5c0-bfef3724b4b8/resourcegroups/kore-msidentityhack-aks-dev-infra-uksouth/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id1"
+	// ident2 := "/subscriptions/18e41964-4477-47e4-b5c0-bfef3724b4b8/resourcegroups/kore-msidentityhack-aks-dev-infra-uksouth/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id2"
+	// client IDs?
+	ident1 := "ea1ebef7-45bc-4811-98ea-94ddf544c0ef"
+	ident2 := "c8312420-5461-4089-b66b-9c481382724d"
+	// object IDs?
+	// ident1 := "6dd1e6ec-ee24-4bdf-a431-9062655234d9"
+	// ident2 := "f22464c1-aea4-46af-9f94-888d48e609cc"
 
 	fmt.Println()
 	fmt.Println("------------------------ SUBSCRIPTION 1 ------------------------")
 	fmt.Println()
 	fmt.Println("ID 1 on Sub 1")
 	fmt.Println()
-	err := doThingWithPrivs1(sub1, clientID1)
+	err := doThingWithPrivs1(sub1, ident1)
 	if err != nil {
 		fmt.Println(fmt.Errorf("ID1 ON SUBCRIPTION 1 DIDN'T WORK, THE VICAR IS SAD: %w", err))
 	} else {
@@ -50,7 +55,7 @@ func main() {
 	fmt.Println()
 	fmt.Println("ID 2 on Sub 1")
 	fmt.Println()
-	err = doThingWithPrivs1(sub1, clientID2)
+	err = doThingWithPrivs1(sub1, ident2)
 	if err != nil {
 		fmt.Println(fmt.Errorf("ID2 ON SUBCRIPTION 1 DIDN'T WORK, THE VICAR IS SAD: %w", err))
 	} else {
@@ -62,7 +67,7 @@ func main() {
 	fmt.Println()
 	fmt.Println("ID 1 on Sub 2")
 	fmt.Println()
-	err = doThingWithPrivs1(sub2, clientID1)
+	err = doThingWithPrivs1(sub2, ident1)
 	if err != nil {
 		fmt.Println(fmt.Errorf("ID1 ON SUBCRIPTION 2 DIDN'T WORK, THE VICAR IS SAD: %w", err))
 	} else {
@@ -72,7 +77,7 @@ func main() {
 	fmt.Println()
 	fmt.Println("ID 2 on Sub 2")
 	fmt.Println()
-	err = doThingWithPrivs1(sub2, clientID2)
+	err = doThingWithPrivs1(sub2, ident2)
 	if err != nil {
 		fmt.Println(fmt.Errorf("ID2 ON SUBCRIPTION 2 DIDN'T WORK, THE VICAR IS SAD: %w", err))
 	} else {
@@ -81,10 +86,10 @@ func main() {
 
 }
 
-func doThingWithPrivs1(subID, clientID string) error {
+func doThingWithPrivs1(subID, ident string) error {
 	// conf := auth.NewMSIConfig()
-	// conf.ClientID = clientID
-	a, err := auth.NewAuthorizerFromEnvironment()
+	// conf.ClientID = ident
+	a, err := auth.NewAuthorizerFromEnvironmentWithResource(ident)
 	if err != nil {
 		return err
 	}
