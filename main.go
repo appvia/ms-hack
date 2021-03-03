@@ -147,8 +147,10 @@ func doThingWithPrivs1(subID, ident, identMode, testZoneResourceGroup, testZoneD
 			fmt.Println(*zone.Name)
 		}
 	}
+	cancel()
 
 	fmt.Println("Attempting to creating zone in subscription", subID)
+	ctx, cancel = context.WithTimeout(context.Background(), time.Second*10)
 	res, err := client.CreateOrUpdate(ctx, testZoneResourceGroup, testZoneDNS, azdns.Zone{}, "", "")
 	if err != nil {
 		cancel()
