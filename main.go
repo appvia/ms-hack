@@ -56,51 +56,58 @@ func main() {
 	testZoneResourceGroup := os.Getenv("TEST_ZONE_RESOURCE_GROUP")
 	testZoneDNS := os.Getenv("TEST_ZONE_DNS")
 
-	fmt.Println()
-	fmt.Println("------------------------ SUBSCRIPTION 1 ------------------------")
-	fmt.Println()
-	fmt.Println("ID 1 on Sub 1")
-	fmt.Println()
-	err := doThingWithPrivs1(sub1, ident1, identMode, testZoneResourceGroup, testZoneDNS)
-	if err != nil {
-		fmt.Println(fmt.Errorf("ID1 ON SUBCRIPTION 1 DIDN'T WORK, THE VICAR IS SAD: %w", err))
-	} else {
-		fmt.Println("ID1 on Subscription 1 worked, the vicar Jumps for Joy")
-	}
+	for {
+		fmt.Println()
+		fmt.Println("TIME:", time.Now().Format("15:04:03"))
+		fmt.Println()
+		fmt.Println("------------------------ SUBSCRIPTION 1 ------------------------")
+		fmt.Println()
+		fmt.Println("ID 1 on Sub 1")
+		fmt.Println()
+		err := doThingWithPrivs1(sub1, ident1, identMode, testZoneResourceGroup, testZoneDNS)
+		if err != nil {
+			fmt.Println(fmt.Errorf("ID1 ON SUBCRIPTION 1 DIDN'T WORK, THE VICAR IS SAD: %w", err))
+		} else {
+			fmt.Println("ID1 on Subscription 1 worked, the vicar Jumps for Joy")
+		}
 
-	fmt.Println()
-	fmt.Println("ID 2 on Sub 1")
-	fmt.Println()
-	err = doThingWithPrivs1(sub1, ident2, identMode, testZoneResourceGroup, testZoneDNS)
-	if err != nil {
-		fmt.Println(fmt.Errorf("ID2 ON SUBCRIPTION 1 DIDN'T WORK, THE VICAR IS SAD: %w", err))
-	} else {
-		fmt.Println("ID2 on Subscription 1 worked, the vicar Jumps for Joy")
-	}
+		fmt.Println()
+		fmt.Println("ID 2 on Sub 1")
+		fmt.Println()
+		err = doThingWithPrivs1(sub1, ident2, identMode, testZoneResourceGroup, testZoneDNS)
+		if err != nil {
+			fmt.Println(fmt.Errorf("ID2 ON SUBCRIPTION 1 DIDN'T WORK, THE VICAR IS SAD: %w", err))
+		} else {
+			fmt.Println("ID2 on Subscription 1 worked, the vicar Jumps for Joy")
+		}
 
-	fmt.Println()
-	fmt.Println("------------------------ SUBSCRIPTION 2 ------------------------")
-	fmt.Println()
-	fmt.Println("ID 1 on Sub 2")
-	fmt.Println()
-	err = doThingWithPrivs1(sub2, ident1, identMode, testZoneResourceGroup, testZoneDNS)
-	if err != nil {
-		fmt.Println(fmt.Errorf("ID1 ON SUBCRIPTION 2 DIDN'T WORK, THE VICAR IS SAD: %w", err))
-	} else {
-		fmt.Println("ID1 on Subscription 1 worked, the vicar Jumps for Joy")
-	}
+		fmt.Println()
+		fmt.Println("------------------------ SUBSCRIPTION 2 ------------------------")
+		fmt.Println()
+		fmt.Println("ID 1 on Sub 2")
+		fmt.Println()
+		err = doThingWithPrivs1(sub2, ident1, identMode, testZoneResourceGroup, testZoneDNS)
+		if err != nil {
+			fmt.Println(fmt.Errorf("ID1 ON SUBCRIPTION 2 DIDN'T WORK, THE VICAR IS SAD: %w", err))
+		} else {
+			fmt.Println("ID1 on Subscription 1 worked, the vicar Jumps for Joy")
+		}
 
-	fmt.Println()
-	fmt.Println("ID 2 on Sub 2")
-	fmt.Println()
-	err = doThingWithPrivs1(sub2, ident2, identMode, testZoneResourceGroup, testZoneDNS)
-	if err != nil {
-		fmt.Println(fmt.Errorf("ID2 ON SUBCRIPTION 2 DIDN'T WORK, THE VICAR IS SAD: %w", err))
-	} else {
-		fmt.Println("ID2 on Subscription 1 worked, the vicar Jumps for Joy")
-	}
+		fmt.Println()
+		fmt.Println("ID 2 on Sub 2")
+		fmt.Println()
+		err = doThingWithPrivs1(sub2, ident2, identMode, testZoneResourceGroup, testZoneDNS)
+		if err != nil {
+			fmt.Println(fmt.Errorf("ID2 ON SUBCRIPTION 2 DIDN'T WORK, THE VICAR IS SAD: %w", err))
+		} else {
+			fmt.Println("ID2 on Subscription 1 worked, the vicar Jumps for Joy")
+		}
 
-	time.Sleep(time.Second * 30)
+		fmt.Println()
+		fmt.Println("Waiting 30 seconds before trying again...")
+		fmt.Println()
+		time.Sleep(time.Second * 30)
+	}
 }
 
 func doThingWithPrivs1(subID, ident, identMode, testZoneResourceGroup, testZoneDNS string) error {
