@@ -15,9 +15,13 @@ spec:
         aadpodidbinding: horris
     spec:
       containers:
-      - image: quay.io/appvia/ms-hack
+      - image: quay.io/appvia/ms-hack:latest
         name: identify
         env:
+        - name: TEST_ZONE_RESOURCE_GROUP
+          value: "kore-msidentityhack-aks-dev-infra-uksouth"
+        - name: TEST_ZONE_DNS
+          value: "horse.appvia.io"
         - name: TEST_SUBSCRIPTION_1
           value: "18e41964-4477-47e4-b5c0-bfef3724b4b8"
         - name: TEST_SUBSCRIPTION_2
@@ -26,5 +30,7 @@ spec:
           value: "msi-clientid"
         - name: IDENTITY_ID_1
           value: "ea1ebef7-45bc-4811-98ea-94ddf544c0ef"
+        #        - name: IDENTITY_ID_2
+        #  value: "c8312420-5461-4089-b66b-9c481382724d"
         - name: IDENTITY_ID_2
-          value: "c8312420-5461-4089-b66b-9c481382724d"
+          value: "be979fb1-d085-44ec-88da-e116e86ed262"
