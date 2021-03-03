@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    aadpodidbinding: horris
+  name: ms-hack
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      aadpodidbinding: horris
+  template:
+    metadata:
+      labels:
+        aadpodidbinding: horris
+    spec:
+      containers:
+      - image: quay.io/appvia/ms-hack
+        name: identify
