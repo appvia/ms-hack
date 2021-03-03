@@ -17,3 +17,14 @@ spec:
       containers:
       - image: quay.io/appvia/ms-hack
         name: identify
+        env:
+        - name: TEST_SUBSCRIPTION_1
+          value: "18e41964-4477-47e4-b5c0-bfef3724b4b8"
+        - name: TEST_SUBSCRIPTION_2
+          value: "0fe8ae6c-8466-4a1e-8a65-80403a6c1b9f"
+        - name: IDENTITY_MODE
+          value: "msi-clientid"
+        - name: IDENTITY_ID_1
+          value: "ea1ebef7-45bc-4811-98ea-94ddf544c0ef"
+        - name: IDENTITY_ID_2
+          value: "c8312420-5461-4089-b66b-9c481382724d"
