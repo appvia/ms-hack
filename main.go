@@ -137,9 +137,10 @@ func doThingWithPrivs1(subID, ident, identMode, testZoneResourceGroup, testZoneD
 	client.Authorizer = a
 
 	fmt.Println("Attempting to list existing zones in subscription", subID)
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	for zonesPage, err := client.List(ctx, to.Int32Ptr(100)); zonesPage.NotDone(); err = zonesPage.NextWithContext(ctx) {
 		if err != nil {
+			cancel()
 			return fmt.Errorf("failed to list DNS zones (subscription: %s, user identity: %s, auth mode: %s): %w", subID, ident, identMode, err)
 		}
 		for _, zone := range zonesPage.Values() {
@@ -150,8 +151,11 @@ func doThingWithPrivs1(subID, ident, identMode, testZoneResourceGroup, testZoneD
 	fmt.Println("Attempting to creating zone in subscription", subID)
 	res, err := client.CreateOrUpdate(ctx, testZoneResourceGroup, testZoneDNS, azdns.Zone{}, "", "")
 	if err != nil {
+		cancel()
 		return fmt.Errorf("failed to create DNS zone (subscription: %s, user identity: %s, auth mode: %s): %w", subID, ident, identMode, err)
 	}
 	fmt.Println("Created ", res.Name)
+
+	cancel()
 	return nil
 }
