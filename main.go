@@ -19,8 +19,11 @@ package main
 import (
 	"context"
 	"fmt"
+	"os"
+	"time"
 
 	azdns "github.com/Azure/azure-sdk-for-go/services/dns/mgmt/2018-05-01/dns"
+	"github.com/Azure/go-autorest/autorest"
 	"github.com/Azure/go-autorest/autorest/azure/auth"
 	"github.com/Azure/go-autorest/autorest/to"
 )
@@ -28,24 +31,37 @@ import (
 func main() {
 	fmt.Println("HELLO VICAR!")
 
-	sub1 := "18e41964-4477-47e4-b5c0-bfef3724b4b8"
-	sub2 := "0fe8ae6c-8466-4a1e-8a65-80403a6c1b9f"
-	// resouce IDs?
+	// subscription IDs:
+	//"18e41964-4477-47e4-b5c0-bfef3724b4b8"
+	//"0fe8ae6c-8466-4a1e-8a65-80403a6c1b9f"
+	sub1 := os.Getenv("TEST_SUBSCRIPTION_1")
+	sub2 := os.Getenv("TEST_SUBSCRIPTION_2")
+
+	// msi-clientid, msi-resouce, env-resource
+	identMode := os.Getenv("IDENTITY_MODE")
+
+	// resource IDs?
 	// ident1 := "/subscriptions/18e41964-4477-47e4-b5c0-bfef3724b4b8/resourcegroups/kore-msidentityhack-aks-dev-infra-uksouth/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id1"
 	// ident2 := "/subscriptions/18e41964-4477-47e4-b5c0-bfef3724b4b8/resourcegroups/kore-msidentityhack-aks-dev-infra-uksouth/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id2"
 	// client IDs?
-	ident1 := "ea1ebef7-45bc-4811-98ea-94ddf544c0ef"
-	ident2 := "c8312420-5461-4089-b66b-9c481382724d"
+	// ident1 := "ea1ebef7-45bc-4811-98ea-94ddf544c0ef"
+	// ident2 := "c8312420-5461-4089-b66b-9c481382724d"
 	// object IDs?
 	// ident1 := "6dd1e6ec-ee24-4bdf-a431-9062655234d9"
 	// ident2 := "f22464c1-aea4-46af-9f94-888d48e609cc"
+	ident1 := os.Getenv("IDENTITY_ID_1")
+	ident2 := os.Getenv("IDENTITY_ID_2")
+
+	// "kore-msidentityhack-aks-dev-infra-uksouth", "horse.appvia.io"
+	testZoneResourceGroup := os.Getenv("TEST_ZONE_RESOURCE_GROUP")
+	testZoneDNS := os.Getenv("TEST_ZONE_DNS")
 
 	fmt.Println()
 	fmt.Println("------------------------ SUBSCRIPTION 1 ------------------------")
 	fmt.Println()
 	fmt.Println("ID 1 on Sub 1")
 	fmt.Println()
-	err := doThingWithPrivs1(sub1, ident1)
+	err := doThingWithPrivs1(sub1, ident1, identMode, testZoneResourceGroup, testZoneDNS)
 	if err != nil {
 		fmt.Println(fmt.Errorf("ID1 ON SUBCRIPTION 1 DIDN'T WORK, THE VICAR IS SAD: %w", err))
 	} else {
@@ -55,7 +71,7 @@ func main() {
 	fmt.Println()
 	fmt.Println("ID 2 on Sub 1")
 	fmt.Println()
-	err = doThingWithPrivs1(sub1, ident2)
+	err = doThingWithPrivs1(sub1, ident2, identMode, testZoneResourceGroup, testZoneDNS)
 	if err != nil {
 		fmt.Println(fmt.Errorf("ID2 ON SUBCRIPTION 1 DIDN'T WORK, THE VICAR IS SAD: %w", err))
 	} else {
@@ -67,7 +83,7 @@ func main() {
 	fmt.Println()
 	fmt.Println("ID 1 on Sub 2")
 	fmt.Println()
-	err = doThingWithPrivs1(sub2, ident1)
+	err = doThingWithPrivs1(sub2, ident1, identMode, testZoneResourceGroup, testZoneDNS)
 	if err != nil {
 		fmt.Println(fmt.Errorf("ID1 ON SUBCRIPTION 2 DIDN'T WORK, THE VICAR IS SAD: %w", err))
 	} else {
@@ -77,21 +93,37 @@ func main() {
 	fmt.Println()
 	fmt.Println("ID 2 on Sub 2")
 	fmt.Println()
-	err = doThingWithPrivs1(sub2, ident2)
+	err = doThingWithPrivs1(sub2, ident2, identMode, testZoneResourceGroup, testZoneDNS)
 	if err != nil {
 		fmt.Println(fmt.Errorf("ID2 ON SUBCRIPTION 2 DIDN'T WORK, THE VICAR IS SAD: %w", err))
 	} else {
 		fmt.Println("ID2 on Subscription 1 worked, the vicar Jumps for Joy")
 	}
 
+	time.Sleep(time.Second * 30)
 }
 
-func doThingWithPrivs1(subID, ident string) error {
-	// conf := auth.NewMSIConfig()
-	// conf.ClientID = ident
-	a, err := auth.NewAuthorizerFromEnvironmentWithResource(ident)
+func doThingWithPrivs1(subID, ident, identMode, testZoneResourceGroup, testZoneDNS string) error {
+	var a autorest.Authorizer
+	var err error
+
+	switch identMode {
+	case "msi-clientid":
+		conf := auth.NewMSIConfig()
+		conf.ClientID = ident
+		a, err = conf.Authorizer()
+	case "msi-resource":
+		conf := auth.NewMSIConfig()
+		conf.Resource = ident
+		a, err = conf.Authorizer()
+	case "env-resource":
+		fallthrough
+	default:
+		a, err = auth.NewAuthorizerFromEnvironmentWithResource(ident)
+	}
+
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to prepare auth (subscription: %s, user identity: %s, auth mode: %s): %w", subID, ident, identMode, err)
 	}
 
 	client := azdns.NewZonesClient(subID)
@@ -101,7 +133,7 @@ func doThingWithPrivs1(subID, ident string) error {
 	ctx := context.Background()
 	for zonesPage, err := client.List(ctx, to.Int32Ptr(100)); zonesPage.NotDone(); err = zonesPage.NextWithContext(ctx) {
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to list DNS zones (subscription: %s, user identity: %s, auth mode: %s): %w", subID, ident, identMode, err)
 		}
 		for _, zone := range zonesPage.Values() {
 			fmt.Println(*zone.Name)
@@ -109,9 +141,9 @@ func doThingWithPrivs1(subID, ident string) error {
 	}
 
 	fmt.Println("Attempting to creating zone in subscription", subID)
-	res, err := client.CreateOrUpdate(ctx, "kore-msidentityhack-aks-dev-infra-uksouth", "horse.appvia.io", azdns.Zone{}, "", "")
+	res, err := client.CreateOrUpdate(ctx, testZoneResourceGroup, testZoneDNS, azdns.Zone{}, "", "")
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to create DNS zone (subscription: %s, user identity: %s, auth mode: %s): %w", subID, ident, identMode, err)
 	}
 	fmt.Println("Created ", res.Name)
 	return nil
