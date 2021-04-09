@@ -1,8 +1,10 @@
 VERSION ?= latest
+REPO ?= quay.io/appvia
+IMAGE ?= ms-hack
 
 image:
-	CGO_ENABLED=0 docker build --build-arg VERSION=${VERSION} -t quay.io/appvia/ms-hack:${VERSION} -f Dockerfile .
+	CGO_ENABLED=0 docker build --build-arg VERSION=${VERSION} -t ${REPO}/${IMAGE}:${VERSION} -f Dockerfile .
 
 push-image:
 	@$(MAKE) image
-	docker push quay.io/appvia/ms-hack:${VERSION}
+	docker push ${REPO}/${IMAGE}:${VERSION}
